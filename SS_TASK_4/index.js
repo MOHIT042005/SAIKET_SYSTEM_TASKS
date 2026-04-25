@@ -1,21 +1,33 @@
 const express = require("express");
 const app = express();
+const db = require("./db");
 
 app.use(express.json());
 
-// In-memory database
-let users = [];
-
-// GET all users
+/* =========================
+   GET ALL USERS
+========================= */
 app.get("/users", (req, res) => {
-    res.json({
-        success: true,
-        count: users.length,
-        data: users
+    db.query("SELECT * FROM users", (err, results) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: "Database error",
+                error: err
+            });
+        }
+
+        res.json({
+            success: true,
+            count: results.length,
+            data: results
+        });
     });
 });
 
-// POST create user
+/* =========================
+   CREATE USER
+========================= */
 app.post("/users", (req, res) => {
     const { name, email, age } = req.body;
 
@@ -41,74 +53,102 @@ app.post("/users", (req, res) => {
         });
     }
 
-    const newUser = {
-        id: users.length + 1,
-        name,
-        email,
-        age
-    };
+    const sql = "INSERT INTO users (name, email, age) VALUES (?, ?, ?)";
 
-    users.push(newUser);
+    db.query(sql, [name, email, age], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: "Insert failed",
+                error: err
+            });
+        }
 
-    res.status(201).json({
-        success: true,
-        data: newUser
+        res.status(201).json({
+            success: true,
+            data: {
+                id: result.insertId,
+                name,
+                email,
+                age
+            }
+        });
     });
 });
 
-// PUT update user
+/* =========================
+   UPDATE USER
+========================= */
 app.put("/users/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    const user = users.find(u => u.id === id);
-
-    if (!user) {
-        return res.status(404).json({
-            success: false,
-            message: "User not found"
-        });
-    }
-
+    const id = req.params.id;
     const { name, email, age } = req.body;
 
     if (email && !email.includes("@")) {
         return res.status(400).json({
             success: false,
-            message: "Invalid email"
+            message: "Invalid email format"
         });
     }
 
-    if (name) user.name = name;
-    if (email) user.email = email;
-    if (age) user.age = age;
+    const sql = "UPDATE users SET name=?, email=?, age=? WHERE id=?";
 
-    res.json({
-        success: true,
-        data: user
+    db.query(sql, [name, email, age, id], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: "Update failed",
+                error: err
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "User updated"
+        });
     });
 });
 
-// DELETE user
+/* =========================
+   DELETE USER
+========================= */
 app.delete("/users/:id", (req, res) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
 
-    const exists = users.some(u => u.id === id);
+    db.query("DELETE FROM users WHERE id=?", [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: "Delete failed",
+                error: err
+            });
+        }
 
-    if (!exists) {
-        return res.status(404).json({
-            success: false,
-            message: "User not found"
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "User deleted"
         });
-    }
-
-    users = users.filter(u => u.id !== id);
-
-    res.json({
-        success: true,
-        message: "User deleted"
     });
 });
 
-// SERVER
-app.listen(3003, () => {
-    console.log("Server running on http://localhost:3003");
+/* =========================
+   SERVER
+========================= */
+const PORT = 3003;
+
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
