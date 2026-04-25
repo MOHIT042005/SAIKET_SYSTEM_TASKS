@@ -1,0 +1,25 @@
+body {
+    font-family: Arial, sans-serif;
+    transition: 0.3s;
+}
+
+/* Hero */
+.hero {
+    height: 60vh;
+    background: linear-gradient(to right, #ff7e5f, #feb47b);
+}
+
+/* Dark Mode */
+.dark {
+    background-color: #121212;
+    color: white;
+}
+
+/* Cards hover */
+.card {
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
