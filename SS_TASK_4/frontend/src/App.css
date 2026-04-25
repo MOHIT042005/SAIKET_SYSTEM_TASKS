@@ -1,0 +1,19 @@
+.container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+input {
+  margin: 5px;
+  padding: 8px;
+}
+
+button {
+  margin: 5px;
+  padding: 8px;
+}
+
+li {
+  list-style: none;
+  margin: 10px;
+}
