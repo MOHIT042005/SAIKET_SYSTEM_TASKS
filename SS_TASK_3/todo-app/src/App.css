@@ -1,0 +1,43 @@
+body {
+  font-family: Arial;
+  background: #f4f4f4;
+}
+
+.container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.input-section input {
+  padding: 10px;
+  width: 200px;
+}
+
+.input-section button {
+  padding: 10px;
+  margin-left: 10px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: white;
+  margin: 10px auto;
+  padding: 10px;
+  width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+button {
+  margin-left: 5px;
+}
+
+li span {
+  flex: 1;
+  text-align: left;
+}
